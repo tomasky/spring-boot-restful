@@ -35,7 +35,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     testCompile('org.springframework.boot:spring-boot-starter-test')
     compile("org.springframework.boot:spring-boot-starter-security")
-    compile 'org.jetbrains.exposed:exposed:0.8.2'
+    compile 'org.jetbrains.exposed:exposed:0.8.3'
+    compile 'com.h2database:h2'
 
     //compile "org.jetbrains.ktor:ktor-core"
 }

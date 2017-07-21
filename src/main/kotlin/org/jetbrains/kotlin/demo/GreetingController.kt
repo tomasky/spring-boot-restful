@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 
 @RestController
 @RequestMapping(value=ApiDomain.HOST_PATH+"/users", produces=arrayOf("application/json"), consumes=arrayOf("application/json"))
@@ -34,9 +35,9 @@ class GreetingController {
         is AccessDeniedException -> HttpStatus.FORBIDDEN.value()
 	else -> status
        }
-       val error = ErrorResponse(status,e.getLocalizedMessage())
 
        if(status != 200){
+          val error = ErrorResponse(status,e.getLocalizedMessage())
          response.setStatus(status)
          return error
       }
@@ -46,17 +47,17 @@ class GreetingController {
 
     @PutMapping("/{id}")
     fun updataUser(@PathVariable id: Long,@RequestBody  account:String) =
-            User(id, "update $id, $account")
+           look.updateUser(id,account)
 
 
     @PostMapping
-    fun addUser(@RequestBody  account:String) =
-            User(0, "add, one")
+    fun addUser(@RequestBody  account:String)= 
+           look.insertUser(account)
 
 
     @DeleteMapping("/{id}")
     fun delUser(@PathVariable id: Long) =
-            User(id, "delete, $id")
+           look.delUser(id)
 
     @GetMapping("/{id}")
     fun getUser(@PathVariable id: Long,@RequestParam page:Int,@RequestParam(required=false) limit:Int?) =  
@@ -64,10 +65,10 @@ class GreetingController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")  
-    fun getUsers(@RequestParam page:Int,@RequestParam(required=false, defaultValue = "10") limit:Int,@RequestParam(required=false, defaultValue = "id") sort:String):List<User> {
+    fun getUsers(@RequestParam page:Int,@RequestParam(required=false, defaultValue = "10") limit:Int,@RequestParam(required=false, defaultValue = "id") sort:String):DataListResponse {
 
         val  domains = look.findUsers()
-        val rets = arrayListOf(User(0,"all accounts")) 
+        val rets = DataListResponse(message=arrayListOf(User(0,"all accounts"))) 
         /*CompletableFuture.allOf(domains).join()*/
 
        return rets 
