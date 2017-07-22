@@ -65,10 +65,10 @@ class GreetingController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")  
-    fun getUsers(@RequestParam page:Int,@RequestParam(required=false, defaultValue = "10") limit:Int,@RequestParam(required=false, defaultValue = "id") sort:String):DataListResponse {
+    fun getUsers(@RequestParam page:Int,@RequestParam(required=false, defaultValue = "10") limit:Int,@RequestParam(required=false, defaultValue = "id") sort:String):DataResponse {
 
         val  domains = look.findUsers()
-        val rets = DataListResponse(message=arrayListOf(User(0,"all accounts"))) 
+        val rets = DataResponse(message=arrayListOf(User(0,"all accounts"))) 
         /*CompletableFuture.allOf(domains).join()*/
 
        return rets 

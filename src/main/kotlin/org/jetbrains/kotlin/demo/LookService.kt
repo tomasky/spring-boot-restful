@@ -10,11 +10,17 @@ import org.springframework.web.client.RestTemplate
 import java.util.concurrent.CompletableFuture
 import org.springframework.stereotype.Component
 import org.springframework.security.access.prepost.PreAuthorize 
+import org.springframework.boot.json.*
 
 @Service
 class LookService {
 
    val  logger:Logger = LoggerFactory.getLogger("LookService")
+
+   fun parseJson(jsonStr:String):Map<String,Any>{
+        val json = BasicJsonParser().parseMap(jsonStr)
+        return json
+   }
 
    @Async("taskExecutor")
    fun  findUsers():CompletableFuture<User> {
@@ -27,19 +33,22 @@ class LookService {
    /*@Async*/
    fun  findUserById(id:Long):DataResponse {
       var ret:Any = DataResponse(4100,"no data")
-       val user = Domains.findById(id)
+       val user = UserRepository.findById(id)
       ret = DataResponse(message= if(user == null)ret else user) 
       return ret 
    }
    fun  insertUser(msg:String ):DataResponse{
-      Domains.insert(msg)
-      return DataResponse(message= "add, one")
+
+      val retId = UserRepository.insert(parseJson(msg))
+      return DataResponse(message= "add, one:$retId")
    }
    fun  updateUser(id:Long,msg:String):DataResponse{
-      return DataResponse(message= "update, one by $id")
+      val ret = UserRepository.update(id,msg)
+      return DataResponse(message= "update, one by $id,ret:$ret")
    }
    fun  delUser(id:Long):DataResponse {
-      return DataResponse(message= "delete, one by $id")
+      val ret = UserRepository.delById(id)
+      return DataResponse(message= "delete, one by $id,ret:$ret")
    }
 
 }
