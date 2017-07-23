@@ -26,13 +26,18 @@ open class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
    @Autowired
    open    fun configureGlobal(auth:AuthenticationManagerBuilder)  {
-      auth.inMemoryAuthentication().withUser("user").password("password").roles("USER")
-      auth.authenticationProvider(DomainUPAuthProvider(tokenService())).authenticationProvider(TokenAuthenticationProvider(tokenService()))
+      /*auth.inMemoryAuthentication().withUser("user").password("password").roles("USER")*/
+      auth.authenticationProvider(DomainUPAuthProvider(tokenService(),getConfig())).authenticationProvider(TokenAuthenticationProvider(tokenService()))
    }
 
 
    @Bean
    fun tokenService():TokenService  {
       return TokenService()
+   }
+
+   @Bean
+   fun getConfig():ConfigInfo{
+      return ConfigInfo()
    }
 }

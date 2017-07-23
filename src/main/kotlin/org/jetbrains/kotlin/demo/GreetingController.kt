@@ -33,6 +33,9 @@ class GreetingController {
        var status = HttpStatus.OK.value() 
        status = when(e){
         is AccessDeniedException -> HttpStatus.FORBIDDEN.value()
+        is org.springframework.web.bind.MissingServletRequestParameterException -> 400 
+	is org.springframework.web.HttpRequestMethodNotSupportedException -> 405
+	is DataCanNotNullException -> 400
 	else -> status
        }
 
@@ -64,7 +67,7 @@ class GreetingController {
     look.findUserById(id)
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")  
+    @PreAuthorize("hasAuthority('ADMIN')")  
     fun getUsers(@RequestParam page:Int,@RequestParam(required=false, defaultValue = "10") limit:Int,@RequestParam(required=false, defaultValue = "id") sort:String):DataResponse {
 
         val  domains = look.findUsers()

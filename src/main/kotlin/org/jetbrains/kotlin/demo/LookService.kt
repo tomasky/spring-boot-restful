@@ -12,13 +12,20 @@ import org.springframework.stereotype.Component
 import org.springframework.security.access.prepost.PreAuthorize 
 import org.springframework.boot.json.*
 
+class DataCanNotNullException(msg:String) :RuntimeException(msg)
+
 @Service
 class LookService {
 
    val  logger:Logger = LoggerFactory.getLogger("LookService")
 
    fun parseJson(jsonStr:String):Map<String,Any>{
-        val json = BasicJsonParser().parseMap(jsonStr)
+      val json = BasicJsonParser().parseMap(jsonStr)
+       for(it in json){
+         if(it.value == null || "null".equals(it.value))
+            throw DataCanNotNullException("input data value can not null")
+
+        }
         return json
    }
 
@@ -43,7 +50,7 @@ class LookService {
       return DataResponse(message= "add, one:$retId")
    }
    fun  updateUser(id:Long,msg:String):DataResponse{
-      val ret = UserRepository.update(id,msg)
+      val ret = UserRepository.update(id,parseJson(msg))
       return DataResponse(message= "update, one by $id,ret:$ret")
    }
    fun  delUser(id:Long):DataResponse {

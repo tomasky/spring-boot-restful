@@ -20,21 +20,20 @@ object Users : Table() {
 
 object UserRepository{
 
-   fun handlerData(id:Long,handMethod: (id:Long) -> Long):Long{
+   fun handlerData(handMethod: () -> Long):Long{
       var ret:Long = 0
       Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;", driver = "org.h2.Driver")
       transaction {
          create (Users)
-         ret =   handMethod(id) 
+         ret =   handMethod() 
       }
       return ret
    }
 
    fun insert(msg:Map<String,Any>):Long{
      var content:String = msg.get("content") as String
-     content = if(content == null) "" else content
-     val ret =  handlerData(0,
-      {id:Long ->
+     val ret =  handlerData(
+      { ->
          Users.insert {
             it[name] = content
          }get Users.id
@@ -45,16 +44,17 @@ object UserRepository{
    }
 
    fun delById(id:Long):Long{
-     return handlerData(id,{id:Long -> 
+     return handlerData({ -> 
          (Users.deleteWhere{Users.id eq id}).toLong()}
    )
   } 
 
-   fun update(id:Long,msg:String):Long{
-      val ret =  handlerData(id,
-      {id:Long ->
+   fun update(id:Long,msg:Map<String,Any>):Long{
+     var content:String = msg.get("content") as String
+      val ret =  handlerData(
+      { ->
          (Users.update({Users.id eq id}) {
-            it[name] = msg
+            it[name] = content
          }).toLong()
       }
       )
