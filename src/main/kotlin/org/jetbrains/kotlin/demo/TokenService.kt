@@ -7,33 +7,36 @@ import sun.misc.BASE64Encoder
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicLong
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
 
+@Component
 class TokenService {
    companion object{
-      const val Expiration = 60*60*12L
+      const val Expiration = 60*60*12*1000L
    }
 
- @JvmField val expiryQueue = DelayQueue<TokenExpiry>()
+val expiryQueue = DelayQueue<TokenExpiry>()
   
 
-@JvmField var tokens = hashMapOf<String,Authentication>()
-@JvmField var users = hashMapOf<String,String>()
+    val  logger = org.slf4j.LoggerFactory.getLogger("tokenService")
+val tokens = hashMapOf<String,Authentication>()
+val users = hashMapOf<String,String>()
     fun generateNewToken():String {
         val genStr = ""+System.currentTimeMillis()+UUID.randomUUID().toString().replace("-","")
         return BASE64Encoder().encodeBuffer(genStr.toByteArray()).replace("\\s+".toRegex(),"")
     }
 
     public fun store(user:String,token:String, authentication:Authentication) {
-          flush()
        
           val oldToken = users.get(user)
           if(oldToken != null){
              tokens.remove(oldToken)
-             storeExpiry(oldToken,token)
           }
           users.put(user,token)
 
           tokens.put(token,authentication)
+
+          storeExpiry(oldToken,token)
     }
     public fun contains(token:String):Boolean  {
        return tokens.contains(token) 
@@ -51,10 +54,12 @@ class TokenService {
         }
     }
 
-    fun storeExpiry(oldtoken:String,token:String){
-       var oldexpiry = TokenExpiry(oldtoken, Expiration)
+    fun storeExpiry(oldtoken:String?,token:String){
        var expiry = TokenExpiry(token, Expiration)
-       expiryQueue.remove(oldexpiry)
+       if(oldtoken != null) {
+          val oldexpiry = TokenExpiry(oldtoken, Expiration)
+          expiryQueue.remove(oldexpiry)
+       }
        expiryQueue.remove(expiry)
        expiryQueue.put(expiry)
     }
