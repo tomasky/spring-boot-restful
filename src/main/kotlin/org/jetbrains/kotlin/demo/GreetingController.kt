@@ -30,17 +30,23 @@ class GreetingController {
     @ResponseBody
     fun handleServiceException(req:HttpServletRequest , response:HttpServletResponse , e:Exception ):ErrorResponse  
     {
-       var status = HttpStatus.OK.value() 
-       status = when(e){
+       var status = when(e){
         is AccessDeniedException -> HttpStatus.FORBIDDEN.value()
         is org.springframework.web.bind.MissingServletRequestParameterException -> 400 
 	is org.springframework.web.HttpRequestMethodNotSupportedException -> 405
+	is java.lang.IllegalArgumentException -> 400
+        is org.springframework.http.converter.HttpMessageNotReadableException -> 4002
 	is DataCanNotNullException -> 400
-	else -> status
+	else -> HttpStatus.OK.value()
        }
 
        if(status != 200){
-          val error = ErrorResponse(status,e.getLocalizedMessage())
+          var msg = e.message?:e.getLocalizedMessage()
+          if(status == 4002){
+            msg =   "json data error"
+            status = 400
+          } 
+          val error = ErrorResponse(status,msg)
          response.setStatus(status)
          return error
       }
@@ -49,7 +55,7 @@ class GreetingController {
 
 
     @PutMapping("/{id}")
-    fun updataUser(@PathVariable id: Long,@RequestBody  account:String) =
+    fun updataUser(@PathVariable id: Long,@RequestBody  account:UserRequestJson) =
            look.updateUser(id,account)
 
 

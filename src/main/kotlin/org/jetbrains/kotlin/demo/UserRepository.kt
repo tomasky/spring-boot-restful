@@ -49,8 +49,8 @@ object UserRepository{
    )
   } 
 
-   fun update(id:Long,msg:Map<String,Any>):Long{
-     var content:String = msg.get("content") as String
+   fun update(id:Long,msg:UserRequestJson):Long{
+     var content:String = msg.content
       val ret =  handlerData(
       { ->
          (Users.update({Users.id eq id}) {

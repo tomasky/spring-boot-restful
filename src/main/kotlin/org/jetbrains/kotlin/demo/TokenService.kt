@@ -45,7 +45,7 @@ val users = hashMapOf<String,String>()
        return tokens.get(token) 
     }
 
-    @Scheduled(fixedDelay = Expiration)
+    @Scheduled(fixedDelay = Expiration/2)
     fun flush(){
        var expiry = expiryQueue.poll()
         while (expiry != null) {

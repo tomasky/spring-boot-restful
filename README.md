@@ -40,7 +40,7 @@ X-Authorization:MTUwMDYzMjE2OTM0NGY0ZjQwMDk5NzMwYzQwNTdhNGZhM2U3ZTY5ZDIxNWJk
 ## Features
 
 * restful 风格api举例
-* Token 身份验证,使用过滤器
+* Token 身份验证,token过期处理,使用过滤器
 * 方法级别权限控制api接口
 * 处理异常自定返回结果 
 * servlet异步响应
