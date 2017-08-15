@@ -37,6 +37,11 @@ class AuthFilter : OncePerRequestFilter {
         }
        if(resourcePath .endsWith("/authenticate") && request.getMethod().equals("POST") ){ 
 
+          if(username == null || password == null){
+             echo(401,response,"Not Found Username or Password")
+             return
+          }
+
           val requestAuthentication = UsernamePasswordAuthenticationToken(username, password);
           val  resultOfAuthentication = tryToAuthenticate(requestAuthentication,response) 
           SecurityContextHolder.getContext().setAuthentication(requestAuthentication )           
@@ -64,7 +69,8 @@ class AuthFilter : OncePerRequestFilter {
         filterChain.doFilter(request, response)
     }
     fun  echo(status:Int ,response : HttpServletResponse,ret:String){
-          response.setStatus(HttpServletResponse.SC_OK)
+          /*response.setStatus(HttpServletResponse.SC_OK)*/
+          response.setStatus(status)
           response.addHeader("Content-Type", "application/json")
           response.getWriter().print("{\"status\":$status,\"message\":\"$ret\"}")
     }
@@ -78,7 +84,7 @@ class AuthFilter : OncePerRequestFilter {
        }
        ret = responseAuthentication
     }catch(e:org.springframework.security.authentication.BadCredentialsException){
-       echo(4010,response,e.getLocalizedMessage())
+       echo(401,response,e.getLocalizedMessage())
     }
     return ret
     }
