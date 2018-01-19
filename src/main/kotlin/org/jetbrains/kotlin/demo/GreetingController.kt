@@ -18,40 +18,13 @@ import org.springframework.web.HttpRequestMethodNotSupportedException
 
 @RestController
 @RequestMapping(value=ApiDomain.HOST_PATH+"/users", produces=arrayOf("application/json"), consumes=arrayOf("application/json"))
-class GreetingController {
+class GreetingController:BaseController() {
    @Autowired
-   lateinit var look:LookService
+   lateinit var look:UserService
 
 
     val  logger = LoggerFactory.getLogger("GreetController")
     val counter = AtomicLong()
-
-    @ExceptionHandler
-    @ResponseBody
-    fun handleServiceException(req:HttpServletRequest , response:HttpServletResponse , e:Exception ):ErrorResponse  
-    {
-       var status = when(e){
-        is AccessDeniedException -> HttpStatus.FORBIDDEN.value()
-        is org.springframework.web.bind.MissingServletRequestParameterException -> 400 
-	is org.springframework.web.HttpRequestMethodNotSupportedException -> 405
-	is java.lang.IllegalArgumentException -> 400
-        is org.springframework.http.converter.HttpMessageNotReadableException -> 4002
-	is DataCanNotNullException -> 400
-	else -> HttpStatus.OK.value()
-       }
-
-       if(status != 200){
-          var msg = e.message?:e.getLocalizedMessage()
-          if(status == 4002){
-            msg =   "json data error"
-            status = 400
-          } 
-          val error = ErrorResponse(status,msg)
-         response.setStatus(status)
-         return error
-      }
-       else throw e
-    }
 
 
     @PutMapping("/{id}")
@@ -77,7 +50,7 @@ class GreetingController {
     fun getUsers(@RequestParam page:Int,@RequestParam(required=false, defaultValue = "10") limit:Int,@RequestParam(required=false, defaultValue = "id") sort:String):DataResponse {
 
         val  domains = look.findUsers()
-        val rets = DataResponse(message=arrayListOf(User(0,"all accounts"))) 
+        val rets = DataResponse(result=arrayListOf(User(0,"all accounts"))) 
         /*CompletableFuture.allOf(domains).join()*/
 
        return rets 

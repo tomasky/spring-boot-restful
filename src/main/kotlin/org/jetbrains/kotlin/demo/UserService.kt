@@ -15,28 +15,26 @@ import com.fasterxml.jackson.annotation.*
 import com.fasterxml.jackson.module.kotlin.*
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-   class UserRequestJson(
+class UserRequestJson(
       @JsonProperty("id") val id: Int,
-      @JsonProperty("content") val content: String   
+      @JsonProperty("name") val name: String   
 )
 
-class DataVALUENotMATCHException(msg:String) :RuntimeException(msg)
-class DataCanNotNullException(msg:String) :RuntimeException(msg)
 
 @Service
-class LookService {
+class UserService {
 
-   val  logger:Logger = LoggerFactory.getLogger("LookService")
+   val  logger:Logger = LoggerFactory.getLogger("UserService")
 
-  fun checkJsonNull(json:Map<String,Any>){
-     for(it in json){
-        if("null".equals(it.value))
-          throw DataCanNotNullException("input data value can not null")
-          else if(it.value is Map<*,*>) {
-             checkJsonNull(it.value as Map<String,Any>)
-          }
-     }
-  }
+   fun checkJsonNull(json:Map<String,Any>){
+      for(it in json){
+         if("null".equals(it.value))
+         throw DataCanNotNullException("input data value can not null")
+         else if(it.value is Map<*,*>) {
+            checkJsonNull(it.value as Map<String,Any>)
+         }
+      }
+   }
 
 
    fun parseJson(jsonStr:String):Map<String,Any>{
@@ -56,21 +54,21 @@ class LookService {
    /*@Async*/
    fun  findUserById(id:Long):DataResponse {
       val user = UserRepository.findById(id)
-      val ret = DataResponse(message= if(user == null)"no datas" else user) 
+      val ret = DataResponse(result= user?:"no datas") 
       return ret 
    }
    fun  insertUser(msg:String ):DataResponse{
 
       val retId = UserRepository.insert(parseJson(msg))
-      return DataResponse(message= "add, one:$retId")
+      return DataResponse(result= "add, one:$retId")
    }
    fun  updateUser(id:Long,msg:UserRequestJson):DataResponse{
       val ret = UserRepository.update(id,msg)
-      return DataResponse(message= "update, one by $id,ret:$ret")
+      return DataResponse(result= "update, one by $id,ret:$ret")
    }
    fun  delUser(id:Long):DataResponse {
       val ret = UserRepository.delById(id)
-      return DataResponse(message= "delete, one by $id,ret:$ret")
+      return DataResponse(result= "delete, one by $id,ret:$ret")
    }
 
 }

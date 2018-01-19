@@ -3,7 +3,10 @@
 This is a basic example of how to use Kotlin in a Spring Boot application. See the [accompanying tutorial](http://kotlinlang.org/docs/tutorials/spring-boot-restful.html)
 for more information.
 
-To run:
+
+> [Github](https://github.com/tomasky/spring-boot-restful)
+
+> To run:
 
 ```
 $ gradle bootRun
@@ -27,7 +30,7 @@ X-Auth-Password:password
 "message": "MTUwMDYzMjE2OTM0NGY0ZjQwMDk5NzMwYzQwNTdhNGZhM2U3ZTY5ZDIxNWJk"
 }
 ```
-最后请求其他接口的时候,在header带上这个token
+最后请求其他接口的时候,在header带上这个token,且输入和输出参数类型都是`content-type:application/json`
 
 ```
 GET  http://localhost:8080/api/v1/users/1?page=1
@@ -42,7 +45,7 @@ X-Authorization:MTUwMDYzMjE2OTM0NGY0ZjQwMDk5NzMwYzQwNTdhNGZhM2U3ZTY5ZDIxNWJk
 * restful 风格api举例
 * Token 身份验证,token过期处理,使用过滤器
 * 方法级别权限控制api接口
-* 处理异常自定返回结果 
+* 处理异常,自定义返回结果 
 * servlet异步响应
 * model数据处理 
 
